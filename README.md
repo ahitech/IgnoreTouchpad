@@ -6,7 +6,7 @@ Its main purpose is to prevent accidental cursor movements and clicks while typi
 
 ---
 
-##  Features
+## ✨ Features
 
 - Temporarily **ignore input from selected devices** (touchpads or mice).
 - Never blocks keyboards or other non-pointing input devices.
@@ -21,13 +21,13 @@ Its main purpose is to prevent accidental cursor movements and clicks while typi
 
 ---
 
-##  Project Structure
+## 📂 Project Structure
 
 TBD
 
 ---
 
-##  How It Works
+## ⚙️ How It Works
 
 1. The `input_addon` monitors all pointing devices registered in the system.
 2. If a device is listed in the **ignore list** (stored in `~/config/settings/IgnoreTouchpad`),  
@@ -49,7 +49,7 @@ ignore_touchpad --unignore-all
 
 ---
 
-##  Safety Considerations
+## 🔐 Safety Considerations
 
 - The **last active pointing device** cannot be ignored (checkbox is disabled in UI, the CLI command will fail).  
 - Booting into Haiku **Safe Mode** with *Disable user add-ons* restores all devices.  
@@ -57,7 +57,7 @@ ignore_touchpad --unignore-all
 
 ---
 
-##  Building
+## 🛠️ Building
 
 This project uses **autotools**:
 
@@ -71,35 +71,25 @@ make install
 
 ---
 
-##  License
+## 📄 License
 
-This project is licensed under the [MIT License](License.md).
+This project is licensed under the MIT License. See License.md.
 
 ---
 
-##  Implemented /  ToDo
+## ✅ Implemented / 🚧 ToDo
 
-     Project structure and initial design
-
-     MIT License and README
-
-     lib/settings shared library
-
-     CLI utility ignore_touchpad
-
-     input_addon for event filtering
-
-     GUI app for managing device settings
-
-     Deskbar replicant with status icon
-
-     Translations (CatKeys)
-
-     Install/uninstall scripts
-
-     Scenarios
-
-       - Always disable touchpad when a known pointing device such as external mouse is connected
-      - Automatically enable touchpad when the external pointing device is disconnected
+🚧 Project structure and initial design
+✅ MIT License and README
+🚧 `lib/settings` shared library
+🚧 CLI utility ignore_touchpad
+🚧 input_addon for event filtering
+🚧 GUI app for managing device settings and preferences
+🚧 Deskbar replicant with status icon
+🚧 Translations (CatKeys)
+🚧 Install/uninstall scripts
+🚧 Scenarios
+  - Always disable touchpad when a known pointing device such as external mouse is connected
+  - Automatically enable touchpad when the external pointing device is disconnected
 
 Happy typing without accidental touchpad clicks! 
