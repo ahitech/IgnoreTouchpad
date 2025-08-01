@@ -23,7 +23,24 @@ Its main purpose is to prevent accidental cursor movements and clicks while typi
 
 ## 📂 Project Structure
 
-TBD
+📂 `IgnoreTouchpad`
+
+├── 📂 `CLI` - command-line utility for listing the devices, setting and resetting device status
+
+├── 📂 `GUI` - GUI utility for listing the devices, setting and resetting device status. It also hosts the Deskbar replicant.
+
+├── 📂 `Settings` - a small shared library for reading and modifying the settings file.
+
+├── 📂 `Addon` - the input server filter that does all of the work of ignoring messages from ignored devices.
+
+├── 📄 `License.md` - for legal purposes
+
+├── 📄 `README.md` - duh
+
+├── 🛠️ `make` - script for compiling the whole damn thing
+
+└── TBD
+
 
 ---
 
@@ -79,7 +96,7 @@ This project is licensed under the MIT License. See License.md.
 
 ## ✅ Implemented / 🚧 ToDo
 
-🚧 Project structure and initial design
+✅ Project structure and initial design
 ✅ MIT License and README
 🚧 `lib/settings` shared library
 🚧 CLI utility ignore_touchpad
