@@ -1,7 +1,0 @@
-<map id="CreateSettingsFile" name="CreateSettingsFile">
-<area shape="rect" id="Node000001" title="Service function for creating a default file with settings. All devices are enabled." alt="" coords="299,5,440,31"/>
-<area shape="rect" id="Node000002" href="$settings_8h.html#a4c8f322743ace99a237a02f22a58caba" title=" " alt="" coords="128,5,251,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="285,21,251,21,251,15,285,15"/>
-<area shape="rect" id="Node000003" href="$settings_8h.html#a8e601881b5de560f49a6c9345e58fb04" title=" " alt="" coords="5,5,80,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="114,21,80,21,80,15,114,15"/>
-</map>
