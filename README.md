@@ -6,6 +6,19 @@ Its main purpose is to prevent accidental cursor movements and clicks while typi
 
 ---
 
+## 📖 Documentation
+
+The full Doxygen-generated documentation for **Ignore Touchpad** is available online:
+
+➡ [**View Documentation**](https://ahitech.github.io/IgnoreTouchpad/)
+
+This documentation includes:
+- Detailed class and method descriptions
+- Data structures used by the Addon, GUI, CLI, and Settings modules
+- Cross-references and diagrams for project architecture
+
+---
+
 ## ✨ Features
 
 - Temporarily **ignore input from selected devices** (touchpads or mice).
@@ -98,6 +111,7 @@ This project is licensed under the MIT License. See License.md.
 
 ✅ Project structure and initial design
 ✅ MIT License and README
+✅ Automatically generated and published documentation in Doxygen format
 🚧 `lib/settings` shared library
 🚧 CLI utility ignore_touchpad
 🚧 input_addon for event filtering
