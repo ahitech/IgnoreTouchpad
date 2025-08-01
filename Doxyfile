@@ -1,0 +1,109 @@
+#--------------------------------------------------------------------------- 
+# Project related configuration options
+#---------------------------------------------------------------------------
+
+PROJECT_NAME           = "Ignore Touchpad"
+PROJECT_BRIEF          = "Utility for Haiku OS to selectively ignore input from touchpads and mice."
+PROJECT_LOGO           =
+OUTPUT_DIRECTORY       = docs
+CREATE_SUBDIRS         = NO
+
+#--------------------------------------------------------------------------- 
+# Build related configuration options
+#---------------------------------------------------------------------------
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_LOCAL_METHODS  = YES
+
+#--------------------------------------------------------------------------- 
+# Configuration options related to warning and progress messages
+#---------------------------------------------------------------------------
+
+QUIET                  = NO
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = YES
+WARN_FORMAT            = "$file:$line: $text"
+
+#--------------------------------------------------------------------------- 
+# Input related configuration options
+#---------------------------------------------------------------------------
+
+INPUT                  = Addon CLI GUI Settings
+FILE_PATTERNS          = *.h *.cpp
+RECURSIVE              = YES
+
+FULL_PATH_NAMES        = NO
+STRIP_FROM_PATH        = .
+STRIP_FROM_INC_PATH    = .
+
+#--------------------------------------------------------------------------- 
+# Source browsing configuration
+#---------------------------------------------------------------------------
+
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = YES
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES
+
+#--------------------------------------------------------------------------- 
+# HTML output configuration
+#---------------------------------------------------------------------------
+
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+HTML_FILE_EXTENSION    = .html
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = YES
+SEARCHENGINE           = YES
+
+#--------------------------------------------------------------------------- 
+# LaTeX / PDF output configuration
+#---------------------------------------------------------------------------
+
+GENERATE_LATEX         = NO
+
+#--------------------------------------------------------------------------- 
+# Dot tool configuration (for graphs)
+#---------------------------------------------------------------------------
+
+HAVE_DOT               = YES
+DOT_NUM_THREADS        = 2
+DOT_IMAGE_FORMAT       = svg
+DOT_TRANSPARENT        = YES
+DOT_MULTI_TARGETS      = YES
+DIRECTORY_GRAPH        = YES
+SHOW_DIRECTORIES       = YES
+SHOW_USED_FILES        = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
+GRAPHICAL_HIERARCHY    = YES
+
+#--------------------------------------------------------------------------- 
+# Grouping
+#---------------------------------------------------------------------------
+
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = NO
+PREDEFINED             =
+TEMPLATE_RELATIONS     = YES
+
+# Группы будут автоматически соответствовать папкам, если добавить \defgroup
+# в шапки файлов Addon/*.h, CLI/*.h, GUI/*.h, Settings/*.h
+
+#--------------------------------------------------------------------------- 
+# Misc
+#---------------------------------------------------------------------------
+
+GENERATE_TAGFILE       =
+ALPHABETICAL_INDEX     = YES
