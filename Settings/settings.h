@@ -7,7 +7,6 @@
 #define _SETTINGS_H_
 
 #include <Errors.h>
-#include <FindDirectory.h>
 #include <Locker.h>
 #include <Messenger.h>
 #include <String.h>
