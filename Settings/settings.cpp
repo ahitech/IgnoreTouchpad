@@ -11,6 +11,10 @@
 
 #include <stdio.h>
 
+/**	\brief		This function was copied directly from the BeBook.
+ *	\see		InputServer and InputDevice
+ *	\returns	Whatever, no-one bothers to check the return value, even in the example :)
+ */
 static bool del_InputDevice(void *ptr)
 {
 	if (ptr) {
@@ -22,46 +26,49 @@ static bool del_InputDevice(void *ptr)
 }
 
 
-
-void SomeFunc( void )
-{
-   // Get a list of all input devices.
-   BList list_o_devices;
-
-   status_t retval = get_input_devices( &list_o_devices );
-   if( retval != B_OK ) return;
-
-   // Do something with the input devices.
-   ...
-
-   // Dispose of the device list.
-   list_o_devices.DoForEach( del_InputDevice );
-   list_o_devices.MakeEmpty();
-}
-
-
+/**	\brief		Constructor.
+ *	\param[in]	target		BMessenger to be notified when the settings file is updated.
+ *	\param[in]	startMonitoring		If `true`, the monitoring is started right away.
+ *									Requires `target` to be not `NULL`.
+ */
 Settings::Settings(BMessenger* target = NULL, bool startMonitoring = false) :
 		fLock("Monitoring")
 {
 	fDevicesStatus.clear();
 	this->SetNotifyTarget(target);
-	if (startMonitoring) {
+	if (target && startMonitoring) {
 		StartMonitoring();	
 	}
 }
 
 
+/**	\brief		Destructor
+ *	\details	Just clears some memory. Probably unnecessary, but a good practice anyway.
+ */
 Settings::~Settings() {
+	if (fMonitoringActive)	{	StopMonitoring(), SetNotifyTarget(NULL); 	}
 	fDevicesStatus.clear();
 }
 
 
-
+/**	\brief		Updates the target to send notifications to.
+ */
 void Settings::SetNotifyTarget(BMessenger* in) {
 	fTarget = in;
 }
 
 
+/**	\brief		Starts monitoring the settings file for changes.
+ *	\details	When the settings file is updated, the target BMessenger
+ *				receives a message from Storage Kit.
+ *	\see		watch_node()
+ *	\returns	B_OK 			If monitoring is already active or if it was started successfully.
+ *				B_BAD_HANDLER	If the target BMessenger is `NULL`.
+ *				B_BAD_VALUE		If Settings::GetPathToSettingsFile() returned NULL.
+ *				B_ENTRY_NOT_FOUND	If the settings file couldn't be created for some reason.
+ *				Some other error	If could not get node ref inside critical section
+ *									or if monitoring could not be started.
+ */
 status_t Settings::StartMonitoring() {
 	if (! fTarget) { return B_BAD_HANDLER; }
 	if (fMonitoringActive) { return B_OK; }
@@ -103,7 +110,7 @@ status_t Settings::StartMonitoring() {
 BPath*	Settings::GetPathToSettingsFile() {
 	BPath* pathToSettingsFile = new BPath();
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, pathToSettingsFile)) {
-	if (B_OK != status) { return status; }
+	if (B_OK != status) { return NULL; }
 	pathToSettingsFile.Append(fileName);
 	return pathToSettingsFile;
 }
@@ -142,7 +149,7 @@ status_t	Settings::CreateSettingsFile() {
 	}	
 	
 	// Dispose of the device list.
-	list_o_devices.DoForEach( del_InputDevice );
+	list_o_devices.DoForEach (del_InputDevice);
 	list_o_devices.MakeEmpty();
 
 	// Save the BMessage with settings
@@ -154,11 +161,3 @@ status_t	Settings::CreateSettingsFile() {
 	return B_OK;
 }
 
-
-
-// Получаем список устройств ввода
-    input_device_ref devices[32];
-    int32 count = 0;
-    status_t status = 
-    if (status != B_OK)
-        return status;

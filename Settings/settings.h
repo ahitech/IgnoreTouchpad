@@ -28,27 +28,46 @@ struct DeviceInfo {
 }
 
 
+/**	\class 		Settings
+ *	\brief		The main purpose of the library
+ *	\details	Provides interface for reading and writing the settings file.
+ *				Allows the add-on to receive live updates if monitoring is active.
+ */
 class Settings {
 public:
+	//!	\copydoc	Settings::Settings
 	Settings(BMessenger* target = NULL, bool startMonitoring = false);
+	//!	\copydoc	Settings::~Settings
 	~Settings();
 	
-	void Save() const;
-	void Load();
+	void Save() const;		//!<	\copydoc	Settings::Save
+	void Load();			//!<	\copydoc	Settings::Load
 	
+	//!	\copydoc	Settings::GetStatus
 	bool GetStatus(BString deviceName);
 	
-	status_t StartMonitoring();
-	void StopMonitoring();
+	status_t StartMonitoring();	//!<	\copydoc	Settings::StartMonitoring
+	void StopMonitoring();		//!<	\copydoc	Settings::StopMonitoring
+	
+	//!	\copydoc	Settings::SetNotifyTarget
 	void SetNotifyTarget(BMessenger* target);
 	
 protected:
+	/**
+	 *	\brief		Structure that holds status of individual devices.
+	 *	\li **key** (`BString`) — the device name as reported by input_server.
+	 *	\li **value** (`bool`) — `true` if the device is ignored, `false` otherwise.
+	 */
 	std::unordered_map<BString, bool> fDevicesStatus;
-	BMessenger*	fTarget;
-	bool	fMonitoringActive;
-	BLocker	fLock;
 	
+	BMessenger*	fTarget;	//!<	What BMessenger should be notified? Can be `NULL`.
+	bool	fMonitoringActive;	//!< `true` if monitoring is currently active, `false` otherwise.
+	//!	Used for updating the settings. Probably overkill, since I use BFile::Lock() as well.
+	BLocker	fLock;			
+	
+	//! Service function for creating a default file with settings. All devices are enabled.
 	status_t	CreateSettingsFile() const;
+	//! Service function that builds path to the settings file.
 	BPath* GetPathToSettingsFile();
 }
 
