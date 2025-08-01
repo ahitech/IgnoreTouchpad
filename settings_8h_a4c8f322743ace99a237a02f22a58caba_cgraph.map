@@ -1,0 +1,10 @@
+<map id="StartMonitoring" name="StartMonitoring">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,43,128,68"/>
+<area shape="rect" id="Node000002" href="$settings_8h.html#adda40614fbfbcd1147035846ff2fdfcf" title="Service function for creating a default file with settings. All devices are enabled." alt="" coords="187,5,328,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,41,178,31,179,36,129,46"/>
+<area shape="rect" id="Node000003" href="$settings_8h.html#a3360589d74d76cac2974ebfbbceac799" title="Service function that builds path to the settings file." alt="" coords="176,79,339,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="129,64,177,73,176,79,127,69"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="226,80,219,70,223,60,236,54,257,52,283,56,294,64,291,68,281,60,257,57,237,59,227,64,225,70,230,77"/>
+<area shape="rect" id="Node000004" href="$settings_8cpp.html#abb5ddbc994d543c5f0f27a3cf8738672" title="This function was copied directly from the BeBook." alt="" coords="387,79,513,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="339,89,373,89,373,94,339,94"/>
+</map>
