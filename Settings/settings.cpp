@@ -3,6 +3,15 @@
 	This file may be used under the terms of the MIT License.
 */
 
+/**
+ * @file settings.cpp
+ * @brief Implementation of the Settings class.
+ * @ingroup SettingsModule
+ *
+ * This file contains the implementation of methods that handle
+ * saving/loading settings and monitoring the settings file.
+ */
+
 #include "settings.h"
 
 #include <FindDirectory.h>
@@ -111,7 +120,7 @@ BPath*	Settings::GetPathToSettingsFile() {
 	BPath* pathToSettingsFile = new BPath();
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, pathToSettingsFile)) {
 	if (B_OK != status) { return NULL; }
-	pathToSettingsFile.Append(fileName);
+	pathToSettingsFile.Append(fFileName);
 	return pathToSettingsFile;
 }
 

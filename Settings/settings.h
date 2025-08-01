@@ -3,6 +3,21 @@
 	This file may be used under the terms of the MIT License.
 */
 
+/**
+ * @file settings.h
+ * @brief Settings manager for Ignore Touchpad project.
+ *
+ * This module is responsible for storing, loading, and monitoring user
+ * settings (ignored input devices) using Haiku's flattened BMessage format.
+ *
+ * @defgroup SettingsModule settings
+ * @brief Classes and functions for reading/writing Ignore Touchpad settings.
+ *
+ * This group contains all classes related to the configuration of ignored
+ * input devices. It includes the Settings manager and its helpers.
+ * @{
+ */
+
 #ifndef _SETTINGS_H_
 #define _SETTINGS_H_
 
@@ -12,20 +27,6 @@
 #include <String.h>
 #include <iostream>
 #include <unordered_map>
-
-const char* fileName = "IgnoreTouchpad";
-
-const 
-
-struct DeviceInfo {
-	BString name;
-	bool disabled;
-	
-	DeviceInfo(BString in) {
-		name = in;
-		disabled = false;
-	}
-}
 
 
 /**	\class 		Settings
@@ -40,8 +41,8 @@ public:
 	//!	\copydoc	Settings::~Settings
 	~Settings();
 	
-	void Save() const;		//!<	\copydoc	Settings::Save
-	void Load();			//!<	\copydoc	Settings::Load
+	void Save() const;		
+	void Load();			
 	
 	//!	\copydoc	Settings::GetStatus
 	bool GetStatus(BString deviceName);
@@ -69,6 +70,10 @@ protected:
 	status_t	CreateSettingsFile() const;
 	//! Service function that builds path to the settings file.
 	BPath* GetPathToSettingsFile();
-}
+	
+	//! File name of the settings file
+	const char* fFileName = "IgnoreTouchpad";
+};
 
 #endif // _SETTINGS_H_
+/** @} */ // end of SettingsModule
