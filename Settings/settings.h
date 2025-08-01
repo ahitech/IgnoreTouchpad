@@ -24,6 +24,7 @@
 #include <Errors.h>
 #include <Locker.h>
 #include <Messenger.h>
+#include <Node.h>
 #include <String.h>
 #include <iostream>
 #include <unordered_map>
@@ -47,8 +48,8 @@ public:
 	//!	\copydoc	Settings::GetStatus
 	bool GetStatus(BString deviceName);
 	
-	status_t StartMonitoring();	//!<	\copydoc	Settings::StartMonitoring
-	void StopMonitoring();		//!<	\copydoc	Settings::StopMonitoring
+	status_t StartMonitoring();		//!<	\copydoc	Settings::StartMonitoring
+	void StopMonitoring();			//!<	\copydoc	Settings::StopMonitoring
 	
 	//!	\copydoc	Settings::SetNotifyTarget
 	void SetNotifyTarget(BMessenger* target);
@@ -73,6 +74,9 @@ protected:
 	
 	//! File name of the settings file
 	const char* fFileName = "IgnoreTouchpad";
+	
+	//! Node reference to the settings file
+	node_ref fNodeRef;
 };
 
 #endif // _SETTINGS_H_

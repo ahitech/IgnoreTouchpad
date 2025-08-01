@@ -17,6 +17,7 @@
 #include <FindDirectory.h>
 #include <InputDevice.h>
 #include <List.h>
+#include <NodeMonitor.h>
 
 #include <stdio.h>
 
@@ -61,8 +62,12 @@ Settings::~Settings() {
 
 
 /**	\brief		Updates the target to send notifications to.
+ *	\note		If monitoring was active, it is stopped <b><u>and not restarted</u></b>.
  */
 void Settings::SetNotifyTarget(BMessenger* in) {
+	if (fMonitoringActive) {
+		StopMonitoring();
+	}
 	fTarget = in;
 }
 
@@ -99,8 +104,7 @@ status_t Settings::StartMonitoring() {
 	}
 	
 	// Get the node reference
-	node_ref nref;
-	status_t status = entry.GetNodeRef(&nref);
+	status_t status = entry.GetNodeRef(&fNodeRef);
     if (B_OK != status) { fLock.Unlock(); return status; }
 
     // Start monitoring
@@ -113,6 +117,18 @@ status_t Settings::StartMonitoring() {
 	// ---==< Exitting critical section >==---
 
     return status;
+}
+
+
+/**	\brief		Stop watching the settings file for changes
+ *	\note		This function does not check the return value of `watch_node()`,
+ *				because, well, why bother?
+ */
+void Settings::StopMonitoring() {
+	if (fTarget && fMonitoringActive) {
+		watch_node(&fNodeRef, B_STOP_WATCHING, fTarget);
+		fMonitoringActive = false;
+	}
 }
 
 
