@@ -28,6 +28,29 @@
 #include <String.h>
 #include <iostream>
 #include <unordered_map>
+#include <vector>
+
+
+/**	\struct		DeviceInfo
+ *	\brief		This struct holds a single device and its status (is it currently connected,
+ *				is it currently ignored).
+ *	\details	The purpose of this structure is holding status of a single device: its name,
+ *				whether it's connected or not right now, whether its input is ignored.
+ */
+struct DeviceInfo {
+	BString		DeviceName;		//!<	Name of the input device
+	bool		IsConnected;	//!<	Is the device currently connected? Yes = "true".
+	bool		IsIgnored;		//!<	Is the device's input ignored? Yes = "true".
+
+	//!		copydoc	DeviceInfo::DeviceInfo	
+	DeviceInfo(BString name, bool connected = true, bool ignored = false);
+	
+	//!		copydoc	DeviceInfo::ToBMessage
+	status_t ToBMessage(BMessage* ) const;
+	
+	//!		copydoc	DeviceInfo::FromBMessage
+	status_t FromBMessage(const BMessage* );
+};
 
 
 /**	\class 		Settings
@@ -42,8 +65,8 @@ public:
 	//!	\copydoc	Settings::~Settings
 	~Settings();
 	
-	void Save() const;		
-	void Load();			
+	void Save() const;		//!<	\copydoc	Settings::Save
+	void Load();			//!<	\copydoc	Settings::Load
 	
 	//!	\copydoc	Settings::GetStatus
 	bool GetStatus(BString deviceName);
@@ -54,13 +77,18 @@ public:
 	//!	\copydoc	Settings::SetNotifyTarget
 	void SetNotifyTarget(BMessenger* target);
 	
+	//!	\copydoc	Settings::GetCurrentlyAttachedDevices
+	std::vector<DeviceInfo> GetCurrentlyAttachedDevices() const;
+	
+	//!	\copydoc	Settings::GetMergedListOfDevices
+	std::vector<DeviceInfo>GetMergedListOfDevices() const;
+	
 protected:
 	/**
 	 *	\brief		Structure that holds status of individual devices.
-	 *	\li **key** (`BString`) — the device name as reported by input_server.
-	 *	\li **value** (`bool`) — `true` if the device is ignored, `false` otherwise.
+	 *	\see		DeviceInfo
 	 */
-	std::unordered_map<BString, bool> fDevicesStatus;
+	std::vector<DeviceInfo> fDevicesStatus;
 	
 	BMessenger*	fTarget;	//!<	What BMessenger should be notified? Can be `NULL`.
 	bool	fMonitoringActive;	//!< `true` if monitoring is currently active, `false` otherwise.
@@ -69,13 +97,13 @@ protected:
 	
 	//! Service function for creating a default file with settings. All devices are enabled.
 	status_t	CreateSettingsFile() const;
-	//! Service function that builds path to the settings file.
-	BPath* GetPathToSettingsFile();
+	
+	BPath* GetPathToSettingsFile() const;	//!<	\copydoc	Settings::GetPathToSettingsFile
 	
 	//! File name of the settings file
 	const char* fFileName = "IgnoreTouchpad";
 	
-	//! Node reference to the settings file
+	//! Node reference to the settings file. Used for monitoring the file.
 	node_ref fNodeRef;
 };
 
