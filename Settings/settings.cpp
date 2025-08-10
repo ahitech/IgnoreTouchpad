@@ -41,7 +41,7 @@ DeviceInfo::DeviceInfo(BString name, bool connected = true, bool ignored = false
  *				B_BAD_VALUE		If the input pointer is NULL
  */
 status_t	DeviceInfo::ToBMessage(BMessage* out) const {
-	if (!out)	return	B_BAD_VALUE;
+	if (!out)	{ return B_BAD_VALUE; }
 	
 	out->what = 'DEVI';
 	out->AddString("name", DeviceName);

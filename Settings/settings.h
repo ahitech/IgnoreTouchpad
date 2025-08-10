@@ -81,7 +81,7 @@ public:
 	std::vector<DeviceInfo> GetCurrentlyAttachedDevices() const;
 	
 	//!	\copydoc	Settings::GetMergedListOfDevices
-	std::vector<DeviceInfo>GetMergedListOfDevices() const;
+	std::vector<DeviceInfo> GetMergedListOfDevices() const;
 	
 protected:
 	/**
@@ -105,6 +105,8 @@ protected:
 	
 	//! Node reference to the settings file. Used for monitoring the file.
 	node_ref fNodeRef;
+	
+	
 };
 
 #endif // _SETTINGS_H_
