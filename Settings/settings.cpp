@@ -71,6 +71,14 @@ status_t	DeviceInfo::FromBMessage(const BMessage* in) {
 }
 
 
+void DeviceInfo::DebugPrint(void) {
+	fprintf(stdout, "[DeviceInfo] Device: %s, connected: %s, disabled: %s.\n",
+			DeviceName.String(),
+			IsConnected ? "true" : "false",
+			IsIgnored ? "true" : "false");
+}
+
+
 /**	\brief		This function was copied directly from the BeBook.
  *	\see		InputServer and InputDevice
  *	\returns	Whatever, no-one bothers to check the return value, even in the example :)
@@ -273,21 +281,18 @@ void Settings::Load() {
 	
 	// Populate the devices map
 	int32 i = 0;
-	BMessage individualDevice;
-	while (readFrom.FindMessage("device", i++, &individualDevice) == B_OK) {
-		BString deviceName;
-		bool deviceIgnored;
-		individualDevice.FindString("name", &deviceName);
-		individualDevice.FindBool("ignored", &deviceIgnored);
-		fDevicesStatus.insert(std::makepair(deviceName, deviceIgnored));
+	BMessage individualDeviceMessage;
+	
+	while (readFrom.FindMessage("device", i++, &individualDeviceMessage) == B_OK) {
+		DeviceInfo individualDevice;
+		individualDevice.FromBMessage(&individualDeviceMessage);		
+		fDevicesStatus.push_back(individualDevice);
+		individualDevice.DebugPrint();
 	}
 	fprintf(stdout, "[Settings Load] %d devices loaded from settings, "
-			"size of map is %d", i, fDevicesStatus.size());
-	
-	//
-	
-	
+			"size of vector is %d", i, fDevicesStatus.size());
 }
+
 
 
 /**	\brief		Save current settings into the settings file
@@ -312,12 +317,11 @@ void Settings::Save() {
 	
 	// Populate the BMessage toSave with pointing devices
 	BMessage* toSave = new BMessage('CONF');
-	int32 listSize = devices.CountItems();
+	int32 listSize = fDevicesStatus.CountItems();
 	int32 i = 0;
-	for (const auto& pair : fDevicesStatus) {		
+	for (const auto& individualDevice : fDevicesStatus) {		
 		BMessage singleDevice('DEVI');
-		singleDevice.AddString("name", pair.first);
-		singleDevice.AddBool("ignored", false);
+		individualDevice.ToBMessage(&singleDevice);
 		toSave->AddMessage("device", &singleDevice);
 	}
 	
@@ -326,4 +330,15 @@ void Settings::Save() {
 	file.Unlock();		// <==== UNLOCK THE FILE, enable access
 	
 	delete pathToSettingsFile;
+}
+
+
+std::vector<DeviceInfo> Settings::GetCurrentlyAttachedDevices() {
+	std::vector<DeviceInfo> toReturn;
+	for (const auto& device : fDevicesStatus) {
+		if (device.IsConnected) {
+			toReturn.push_back(device);
+		}
+	}
+	return toReturn;
 }

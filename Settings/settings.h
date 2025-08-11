@@ -50,6 +50,9 @@ struct DeviceInfo {
 	
 	//!		copydoc	DeviceInfo::FromBMessage
 	status_t FromBMessage(const BMessage* );
+	
+	//!		Printing debugging information
+	void DebugPrint(void) const;
 };
 
 
@@ -95,8 +98,8 @@ protected:
 	//!	Used for updating the settings. Probably overkill, since I use BFile::Lock() as well.
 	BLocker	fLock;			
 	
-	//! Service function for creating a default file with settings. All devices are enabled.
-	status_t	CreateSettingsFile() const;
+	// Service function for creating a default file with settings. All devices are enabled.
+	// status_t	CreateSettingsFile() const;
 	
 	BPath* GetPathToSettingsFile() const;	//!<	\copydoc	Settings::GetPathToSettingsFile
 	
