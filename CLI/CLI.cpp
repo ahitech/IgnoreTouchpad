@@ -9,33 +9,74 @@
 #include <Input.h>
 #include <List.h>
 #include <stdio.h>
-#include <string.h>
+#include <iostream>
+#include <sstream>
 
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Ignore Touchpad CLI"
 
-int main(int argc, char *argv[])
-{
-	CommandType returnValue = CommandType::Undefined;
-	
-	CommandType = ParseInputOptions(argc, argv);
-	
-	if (returnValue == CommandType::Undefined) {
-		PrintUsage();
-		return 1;
-	}
-	
-	return 0;
+
+DeviceStructure::~DeviceStructure() {
+	if (device) { delete device; }
 }
 
 
-void Clean(BList* inputDevices) {
-	uint count = inputDevices.CountItems();
-	for (int32 i = 0; i < count; i++) {
-        delete ((BInputDevice*)(inputDevices.ItemAt(i)));
+int main(int argc, char** argv) {
+	if (argc < 2) {
+		PrintUsage();
+		return 0;
 	}
-	list.MakeEmpty();	
+
+	std::vector<std::string> args(argv + 1, argv + argc);
+	ParsedCommand command = ParseCommand(args);
+
+	Clean (&gDevices);
+	BuildListOfDevices();
+
+	if (command.type == CommandType::kInteractive) {
+		RunInteractiveLoop();
+		Clean(&gDevices);
+		return 0;
+	}
+
+	Clean(&gDevices);
+	return ExecuteCommand(command);
+}
+
+
+void Clean(BList *in) {
+	if (!in) return;
+	uint count = in->CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BInputDevice* delDev = static_cast<BInputDevice*>(in->ItemAt(i));
+		DeviceStructure* delStr = static_cast<DeviceStructure*>(in->ItemAt(i));
+		if (delDev) delete delDev;
+		if (delStr) delete delStr;
+	}
+	in->MakeEmpty();
+}
+
+
+void RunInteractiveLoop() {
+	std::string input;
+	while (true) {
+		std::cout << "> " << std::flush;
+		if (!std::getline(std::cin, input)) break;
+
+		std::istringstream iss(input);
+		std::vector<std::string> args;
+		std::string token;
+		while (iss >> token) args.push_back(token);
+
+		if (args.empty()) continue;
+
+		ParsedCommand command = ParseCommand(args);
+		if (command.type == CommandType::kQuit)
+			break;
+
+		ExecuteCommand(command);
+	}
 }
 
 
@@ -51,19 +92,23 @@ ParsedCommand ParseCommand(const std::vector<std::string>& args) {
 
     if (action == "list") {
         cmd.type = CommandType::kList;
-    } else if (action == "enable" && args.size() == 2) {
+    } else if ((action == "enable" || action == "e" || action == "E")
+               && args.size() == 2) {
         cmd.type = CommandType::kEnable;
         cmd.deviceNumber = std::stoi(args[1]);
-    } else if (action == "disable" && args.size() == 2) {
+    } else if ((action == "disable" || action == "d" || action == "D")
+               && args.size() == 2) {
         cmd.type = CommandType::kDisable;
         cmd.deviceNumber = std::stoi(args[1]);
-    } else if (action == "enable_all") {
+    } else if (action == "enable_all" || action == "ea" || action == "EA") {
         cmd.type = CommandType::kEnableAll;
         cmd.deviceNumber = 0;
-    } else if (action == "help") {
+    } else if (action == "help" || action == "?") {
         cmd.type = CommandType::kHelp;
     } else if (action == "interactive") {
         cmd.type = CommandType::kInteractive;
+    } else if (action == "refresh") {
+    	cmd.type = CommandType::kList;
     } else if (action == "quit") {
         cmd.type = CommandType::kQuit;
     } else {
@@ -74,28 +119,86 @@ ParsedCommand ParseCommand(const std::vector<std::string>& args) {
 }
 
 
-void ListDevices() {
-    int32 count = 0;
-	BList list;
-    status_t err = get_input_devices(&list);
+void BuildListOfDevices() {
+	Clean(&gDevices);
+	BList devices;
+    status_t err = get_input_devices(&devices);
     if (err != B_OK) {
-        fprintf(stderr, "Failed to get input devices: %s\n", strerror(err));
-        return 1;
+        fprintf(stderr, "[BuildListOfDevices] Failed to get input devices: %s\n", strerror(err));
     }
-
-    printf("Connected pointing devices:\n");
-    count = list.CountItems();
-
-    for (int32 i = 0; i < count; i++) {
-        BInputDevice* info = list.ItemAt(i);
-        if (info && info->Type() == B_POINTING_DEVICE)
-        {
-            printf(" %d - %s\n", i, info->Name(),
-            		(info->IsRunning() ? "enabled" : "disabled");
+    
+    int count = devices.CountItems();
+    for (int32 i = count - 1; i >= 0; i--) {
+        BInputDevice* info = static_cast<BInputDevice*>(devices.ItemAt(i));
+        if (!info || info->Type() != B_POINTING_DEVICE) {
+        	devices.RemoveItem(i);
         }
+    }
+    
+    count = devices.CountItems();
+    for (uint i = 0; i < count; i++) {
+    	DeviceStructure device;
+    	device.device = static_cast<BInputDevice*>(devices.ItemAt(i));
+    	device.enabled = device.device->IsRunning();
+    	device.number = i;
+    	gDevices.AddItem(&device, i);
+    }
+    
+    Clean (&devices);
+}
+
+void ListDevices() {
+	BuildListOfDevices();
+	
+    int32 count = 0;
+    count = gDevices.CountItems();
+
+	if (count) printf("Connected pointing devices:\n");
+    for (int32 i = 0; i < count; i++) {
+    	DeviceStructure* dev = (DeviceStructure*)gDevices.ItemAt(i);
+    	
+        printf(" %d. %s - $s\n", dev->number,
+        			 dev->device->Name(),
+            		(dev->enabled ? "enabled" : "disabled"));
     }
 }
 
+
+status_t EnableDevice(BInputDevice* dev) {
+	status_t toReturn = B_OK;
+	if (dev) {
+		toReturn = dev->Start();
+		if (B_OK != toReturn) {
+			fprintf(stderr, B_TRANSLATE("[EnableDevice] Error enabling device \'%s\': %s\n"),
+					dev->Name(), strerror(toReturn));
+		}
+	}
+	return toReturn;
+}
+
+
+status_t DisableDevice(BInputDevice* dev) {
+	status_t toReturn = B_OK;
+	if (dev) {
+		toReturn = dev->Stop();
+		if (B_OK != toReturn) {
+			fprintf(stderr, B_TRANSLATE("[DisableDevice] Error disabling device \'%s\': %s\n"),
+					dev->Name(), strerror(toReturn));
+		}
+	}
+	return toReturn;
+}
+
+
+
+status_t EnableAll() {
+	status_t toReturn = BInputDevice::Start(B_POINTING_DEVICE);
+	if (B_OK != toReturn) {
+		fprintf(stderr, B_TRANSLATE("[EnableAll] Error enabling all devices: %s\n"),
+					strerror(toReturn));
+	}
+	return toReturn;
+}
 
 
 void PrintUsage() {
@@ -104,15 +207,73 @@ void PrintUsage() {
 		   "device is connected to a notebook.\n"));
 	printf(B_TRANSLATE("It can run in either interactive or non-interactive mode.\n\n"));
 	printf(B_TRANSLATE("Supported options (in both modes, unless stated othwerwise):\n"));
-	printf(B_TRANSLATE("  list        - Print a numbered list of the pointing input devices.\n"));
+	printf(B_TRANSLATE("  list        - Build and print a numbered list of the pointing input devices.\n"
+					   "                Note: this option recreates the list of devices and updates it.\n"));
+	printf(B_TRANSLATE("  refresh     - Equals to \"list\".\n"));
 	printf(B_TRANSLATE("  enable #    - Enable a device number #. The number you take from the \"list\" command.\n"));
 	printf(B_TRANSLATE("                If a device is already enabled, or if the number is wrong, nothing happens.\n"));
+	printf(B_TRANSLATE("  e # or E #  - Equals to \"enable #\", just fewer symbols to type. :) \n"));
 	printf(B_TRANSLATE("  disable #   - Disable a device number #. The number you take from the \"list\" command.\n"));
 	printf(B_TRANSLATE("                If a device is already disabled, or if the number is wrong, nothing happens.\n"));
+	printf(B_TRANSLATE("  d # or D #  - Equals to \"disable #\", just fewer symbols to type. :) \n"));
 	printf(B_TRANSLATE("  enable_all  - Immediately enable all devices. If you accidentally disabled the last\n"
 					   "                mouse, you can enable it.\nDefault shortcut: Ctrl + Alt + Win + E.\n"
 					   "                (You can change in \'Shortcuts\', if you want, but this text won't be updated.\n"));
-	printf(B_TRANSLATE("  help        - Display list of the available commands.\n"));
+	printf(B_TRANSLATE("  EA or ea    - Equals to \"enable all\", just fewer symbols to type. :) \n"));
+	printf(B_TRANSLATE("  help or ?   - Display list of the available commands.\n"));
 	printf(B_TRANSLATE("  interactive - (Command line option only) Enter interactive mode.\n"));
 	printf(B_TRANSLATE("  quit        - (Interactive mode only) Quit interactive mode.\n"));
+}
+
+
+status_t ExecuteCommand(const ParsedCommand& command) {
+	
+	switch (command.type) {
+		case CommandType::kList:
+			ListDevices();
+			return B_OK;
+
+		case CommandType::kEnable:
+			if (command.deviceNumber >= 0) {
+				uint count = gDevices.CountItems();
+				for (uint i = 0; i < count; i++) {
+					DeviceStructure* dev = (DeviceStructure*)gDevices.ItemAt(i);
+					if (dev->number == i) {
+						return EnableDevice(dev->device);
+					}	
+				}
+			}
+			return B_OK;
+
+		case CommandType::kDisable:
+			if (command.deviceNumber >= 0) {
+				uint count = gDevices.CountItems();
+				for (uint i = 0; i < count; i++) {
+					DeviceStructure* dev = (DeviceStructure*)gDevices.ItemAt(i);
+					if (dev->number == i) {
+						return DisableDevice(dev->device);
+					}	
+				}
+			}
+			return B_OK;
+
+		case CommandType::kEnableAll:			
+			return EnableAll();
+
+		case CommandType::kHelp:
+			PrintUsage();
+			return B_OK;
+
+		case CommandType::kQuit:
+			// Только для интерактивного режима
+			return B_OK;
+		
+		case CommandType::kUnknown:
+			PrintUsage();
+			return B_OK;
+
+		default:
+			fprintf(stderr, "Unknown command. Type 'help'.\n");
+			return B_ERROR;
+	}
 }
