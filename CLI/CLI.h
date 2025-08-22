@@ -9,15 +9,23 @@
 #include <SupportDefs.h>
 #include <InputDevice.h>
 
-typedef enum class InputOptions {
-	Undefined,
-	List,
-	Disable,
-	Enable,
-	EnableAll
-} InputOptions;
+enum class CommandType {
+    kUnknown,
+    kList,
+    kEnable,
+    kDisable,
+    kEnableAll,
+    kHelp,
+    kInteractive,
+    kQuit
+};
 
-enum class InputOptions ParseInputOptions(int argc, char *argv[]);
+struct ParsedCommand {
+    CommandType type;
+    int deviceNumber = -1; // по умолчанию недействителен
+};
+
+enum class CommandType ParseInputOptions(int argc, char *argv[]);
 void ListDevices();
 void PrintUsage();
 status_t DisableDevice(BInputDevice*);

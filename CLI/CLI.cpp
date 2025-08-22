@@ -17,11 +17,11 @@
 
 int main(int argc, char *argv[])
 {
-	InputOptions returnValue = InputOptions::Undefined;
+	CommandType returnValue = CommandType::Undefined;
 	
-	returnValue = ParseInputOptions(argc, argv);
+	CommandType = ParseInputOptions(argc, argv);
 	
-	if (returnValue == InputOptions::Undefined) {
+	if (returnValue == CommandType::Undefined) {
 		PrintUsage();
 		return 1;
 	}
@@ -39,10 +39,38 @@ void Clean(BList* inputDevices) {
 }
 
 
-enum class InputOptions ParseInputOptions(int argc, char* argv[]) {
-	InputOptions 
-	
-		
+ParsedCommand ParseCommand(const std::vector<std::string>& args) {
+    ParsedCommand cmd;
+
+    if (args.empty()) {
+        cmd.type = CommandType::kHelp;
+        return cmd;
+    }
+
+    const std::string& action = args[0];
+
+    if (action == "list") {
+        cmd.type = CommandType::kList;
+    } else if (action == "enable" && args.size() == 2) {
+        cmd.type = CommandType::kEnable;
+        cmd.deviceNumber = std::stoi(args[1]);
+    } else if (action == "disable" && args.size() == 2) {
+        cmd.type = CommandType::kDisable;
+        cmd.deviceNumber = std::stoi(args[1]);
+    } else if (action == "enable_all") {
+        cmd.type = CommandType::kEnableAll;
+        cmd.deviceNumber = 0;
+    } else if (action == "help") {
+        cmd.type = CommandType::kHelp;
+    } else if (action == "interactive") {
+        cmd.type = CommandType::kInteractive;
+    } else if (action == "quit") {
+        cmd.type = CommandType::kQuit;
+    } else {
+        cmd.type = CommandType::kUnknown;
+    }
+
+    return cmd;
 }
 
 
@@ -62,7 +90,8 @@ void ListDevices() {
         BInputDevice* info = list.ItemAt(i);
         if (info && info->Type() == B_POINTING_DEVICE)
         {
-            printf(" %d - %s\n", i, info->Name());
+            printf(" %d - %s\n", i, info->Name(),
+            		(info->IsRunning() ? "enabled" : "disabled");
         }
     }
 }
