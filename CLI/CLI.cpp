@@ -253,6 +253,20 @@ status_t ExecuteCommand(const ParsedCommand& command) {
 		case CommandType::kDisable:
 			if (command.deviceNumber >= 0) {
 				uint count = gDevices.CountItems();
+				uint enabledDevices = 0;
+				
+				// Can't disable last pointing device!
+				for (uint i = 0; i < count; i++) {
+					DeviceStructure* dev = (DeviceStructure*)gDevices.ItemAt(i);
+					if (dev->enabled) {
+						enabledDevices++;
+					}	
+				}
+				
+				if (enabledDevices == 1) {
+					fprintf (stderr, "[Disable Device]: Can't disable last active pointing device!\n");
+					return B_OK;
+				}
 				for (uint i = 0; i < count; i++) {
 					DeviceStructure* dev = (DeviceStructure*)gDevices.ItemAt(i);
 					if (dev->number == i) {
