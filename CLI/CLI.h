@@ -44,7 +44,7 @@ void PrintUsage();
 status_t DisableDevice(BInputDevice*);
 status_t EnableDevice(BInputDevice*);
 status_t EnableAll();
-void Clean(BList*);
+void Clean(BList*, bool);
 status_t ExecuteCommand(const ParsedCommand& command);
 void RunInteractiveLoop();
 

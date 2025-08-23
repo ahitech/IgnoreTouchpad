@@ -31,28 +31,31 @@ int main(int argc, char** argv) {
 	std::vector<std::string> args(argv + 1, argv + argc);
 	ParsedCommand command = ParseCommand(args);
 
-	Clean (&gDevices);
+	Clean(&gDevices, true);
 	BuildListOfDevices();
 
 	if (command.type == CommandType::kInteractive) {
 		RunInteractiveLoop();
-		Clean(&gDevices);
+		Clean(&gDevices, true);
 		return 0;
 	}
 
-	Clean(&gDevices);
+	Clean(&gDevices, true);
 	return ExecuteCommand(command);
 }
 
 
-void Clean(BList *in) {
+void Clean(BList *in, bool cleaningGDevices = false) {
 	if (!in) return;
 	uint count = in->CountItems();
 	for (int32 i = 0; i < count; i++) {
-		BInputDevice* delDev = static_cast<BInputDevice*>(in->ItemAt(i));
-		DeviceStructure* delStr = static_cast<DeviceStructure*>(in->ItemAt(i));
-		if (delDev) delete delDev;
-		if (delStr) delete delStr;
+		if (cleaningGDevices) {
+			DeviceStructure* delStr = static_cast<DeviceStructure*>(in->ItemAt(i));
+			delete delStr;
+		} else {
+			BInputDevice* delDev = static_cast<BInputDevice*>(in->ItemAt(i));
+			delete delDev;
+		}
 	}
 	in->MakeEmpty();
 }
@@ -120,7 +123,7 @@ ParsedCommand ParseCommand(const std::vector<std::string>& args) {
 
 
 void BuildListOfDevices() {
-	Clean(&gDevices);
+	Clean(&gDevices, true);
 	BList devices;
     status_t err = get_input_devices(&devices);
     if (err != B_OK) {
@@ -144,7 +147,7 @@ void BuildListOfDevices() {
     	gDevices.AddItem(&device, i);
     }
     
-    Clean (&devices);
+    Clean(&devices, false);
 }
 
 void ListDevices() {
@@ -217,7 +220,7 @@ void PrintUsage() {
 	printf(B_TRANSLATE("                If a device is already disabled, or if the number is wrong, nothing happens.\n"));
 	printf(B_TRANSLATE("  d # or D #  - Equals to \"disable #\", just fewer symbols to type. :) \n"));
 	printf(B_TRANSLATE("  enable_all  - Immediately enable all devices. If you accidentally disabled the last\n"
-					   "                mouse, you can enable it.\nDefault shortcut: Ctrl + Alt + Win + E.\n"
+					   "                mouse, you can enable it.\n\tDefault shortcut: Ctrl + Alt + Win + E.\n"
 					   "                (You can change in \'Shortcuts\', if you want, but this text won't be updated.\n"));
 	printf(B_TRANSLATE("  EA or ea    - Equals to \"enable all\", just fewer symbols to type. :) \n"));
 	printf(B_TRANSLATE("  help or ?   - Display list of the available commands.\n"));
