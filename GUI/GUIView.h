@@ -5,6 +5,9 @@
 #ifndef _GUI_VIEW_H_
 #define _GUI_VIEW_H_
 
+#include "common.h"
+#include "GUISettings.h"
+
 #include <InterfaceDefs.h>
 #include <TranslationKit.h>
 #include <Deskbar.h>
@@ -24,27 +27,6 @@
 #include <StorageKit.h>
 #include <WindowInfo.h>
 
-// used to check the image to use to get the resources
-#define APP_NAME "IgnoreTouchpad"
-#define APP_SIG "application/x-vnd.hitech.IgnoreTouchpad"
-
-// resources
-#define ACTIVE_ICON "IT:ON"
-#define INACTIVE_ICON "IT:OFF"
-
-// messages
-
-#define ADD_TO_TRAY 'zATT'
-#define REMOVE_FROM_TRAY 'zRFT'
-#define OPEN_SETTINGS 'zOPS'
-#define MSG_DELAY_POPUP 'arDP'
-#define MSG_TOGGLE_ACTIVE 'arTA'
-#define MSG_SET_ACTIVE 'arSA'
-#define MSG_SET_INACTIVE 'arSI'
-#define MSG_SET_DELAY 'arSD'
-#define MSG_SET_MODE 'arSM'
-#define MSG_SET_BEHAVIOUR 'arSB'
-
 
 
 //exported instantiator function
@@ -59,11 +41,21 @@ status_t removeFromDeskbar(void *);
 class _EXPORT TrayView;
 
 
+struct DeviceStructure {
+	BInputDevice* device;
+	bool		  enabled;
+	uint		  number;
+	
+	virtual ~DeviceStructure() {if (device) { delete device; device = NULL; }};
+};
+
+
+
 
 class TrayView : 
 	public BView
 {
-private:
+	protected:
 
 		BBitmap *_activeIcon, *_inactiveIcon;
 		bool fWatching;
@@ -71,7 +63,9 @@ private:
 		void _init(void); //initialization common to all constructors
 		
 		BList fInputDevices;
+		void ListDevices();
 		void BuildDevicesList(BList& );
+		void Clean(BList*, bool cleaningGlobalDevices = false);
 
 	public:
 		volatile thread_id last_raiser_thread;
