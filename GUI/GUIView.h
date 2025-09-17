@@ -46,14 +46,17 @@ class _EXPORT TrayView;
 
 struct DeviceStructure {
 	BInputDevice* device;
+	BString		  deviceName;
 	bool		  enabled;
 	uint		  number;
 	
 	virtual ~DeviceStructure() {if (device) { delete device; device = NULL; }};
 };
 
-
-
+		
+void ListDevices();	
+void BuildDevicesList(BList& );
+void Clean(BList*, bool cleaningGlobalDevices = false);
 
 class TrayView : 
 	public BView
@@ -64,11 +67,8 @@ class TrayView :
 		bool fWatching;
 
 		void _init(void); //initialization common to all constructors
+
 		
-		BList fInputDevices;
-		void ListDevices();
-		void BuildDevicesList(BList& );
-		void Clean(BList*, bool cleaningGlobalDevices = false);
 
 	public:
 		volatile thread_id last_raiser_thread;
@@ -77,6 +77,9 @@ class TrayView :
 		bigtime_t polling_delay;
 		sem_id fPollerSem;
 		thread_id poller_thread;
+		
+		Toggle(int deviceNo);
+		EnableAll();
 
 		TrayView();
 		TrayView(BMessage *mdArchive);

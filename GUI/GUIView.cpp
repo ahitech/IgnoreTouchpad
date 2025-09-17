@@ -64,144 +64,41 @@ ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
 	BMenuItem *tmpi;
 	BMessage *msg;
 
-	AutoRaiseSettings *s = tv->Settings();
+//	AutoRaiseSettings *s = tv->Settings();
 
 	SetFont(be_plain_font);
 	
+	BList devicesList;
+	BuildDevicesList(devicesList);
+	int itemsCount = devicesList.Count();
 	
+	for (int i = 0; i < itemsCount; ++i) {
+		msg = new BMessage('TOGL');
+		msg->AddInt16("device", i);
+		DeviceStructure* currentDevice = static_cast<DeviceStructure*>devicesList.ItemAt(i);
+		if (!currentDevice) { continue; }
+		tmpi = new BMenuItem(currentDevice->deviceName.String(), tmpm);
+		
+		// If the device is active, its item is checked
+		if (currentDevice->enabled) {
+			tmpi->SetMarked();
+		}
+		
+		// Don't allow disabling the last active pointing device
+		if (itemsCount == 1 && currentDevice->enabled) {
+			tmpi->SetEnabled(false);
+		}
+		
+		AddItem(tmpi);
+	}
 	
+	AddSeparatorItem();
 	
-	
-	
-	
-	
-	
-	
-
-
-	BMenuItem *active = new BMenuItem(B_TRANSLATE("Active"),
-		new BMessage(MSG_TOGGLE_ACTIVE));
-	active->SetMarked(s->Active());
-	AddItem(active);
-
-	tmpm = new BMenu(B_TRANSLATE("Mode"));
-	tmpm->SetFont(be_plain_font);
-
-	msg = new BMessage(MSG_SET_MODE);
-	msg->AddInt32(AR_MODE, Mode_All);
-	tmpi = new BMenuItem(B_TRANSLATE("Default (all windows)"), msg);
-	tmpi->SetMarked(s->Mode() == Mode_All);
-	tmpm->AddItem(tmpi);
-
-	msg = new BMessage(MSG_SET_MODE);
-	msg->AddInt32(AR_MODE, Mode_DeskbarOver);
-	tmpi = new BMenuItem(B_TRANSLATE("Deskbar only (over its area)"), msg);
-	tmpi->SetMarked(s->Mode() == Mode_DeskbarOver);
-	tmpm->AddItem(tmpi);
-
-	msg = new BMessage(MSG_SET_MODE);
-	msg->AddInt32(AR_MODE, Mode_DeskbarTouch);
-	tmpi = new BMenuItem(B_TRANSLATE("Deskbar only (touch)"), msg);
-	tmpi->SetMarked(s->Mode() == Mode_DeskbarTouch);
-	tmpm->AddItem(tmpi);
-
-
-	tmpm->SetTargetForItems(tv);
-	BMenuItem *modem = new BMenuItem(tmpm);
-	modem->SetEnabled(s->Active());
-	AddItem(modem);
-
-	tmpm = new BMenu(B_TRANSLATE("Inactive behaviour"));
-	tmpm->SetFont(be_plain_font);
-
-	msg = new BMessage(MSG_SET_BEHAVIOUR);
-	msg->AddInt32(AR_BEHAVIOUR, B_NORMAL_MOUSE);
-	tmpi = new BMenuItem(B_TRANSLATE("Normal"), msg);
-	tmpi->SetMarked(tv->fNormalMM == B_NORMAL_MOUSE);
-	tmpm->AddItem(tmpi);
-
-	msg = new BMessage(MSG_SET_BEHAVIOUR);
-	msg->AddInt32(AR_BEHAVIOUR, B_FOCUS_FOLLOWS_MOUSE);
-	tmpi = new BMenuItem(B_TRANSLATE("Focus follows mouse"), msg);
-	tmpi->SetMarked(tv->fNormalMM == B_FOCUS_FOLLOWS_MOUSE);
-	tmpm->AddItem(tmpi);
-
-	msg = new BMessage(MSG_SET_BEHAVIOUR);
-	msg->AddInt32(AR_BEHAVIOUR, B_WARP_FOCUS_FOLLOWS_MOUSE);
-	tmpi = new BMenuItem(B_TRANSLATE("Warping (ffm)"), msg);
-	tmpi->SetMarked(tv->fNormalMM == (mode_mouse)B_WARP_FOCUS_FOLLOWS_MOUSE);
-	tmpm->AddItem(tmpi);
-
-	msg = new BMessage(MSG_SET_BEHAVIOUR);
-	msg->AddInt32(AR_BEHAVIOUR, B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE);
-	tmpi = new BMenuItem(B_TRANSLATE("Instant warping (ffm)"), msg);
-	tmpi->SetMarked(tv->fNormalMM == (mode_mouse)B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE);
-	tmpm->AddItem(tmpi);
-
-	tmpm->SetTargetForItems(tv);
-	BMenuItem *behavm = new BMenuItem(tmpm);
-	AddItem(behavm);
-
-
-	tmpm = new BMenu(B_TRANSLATE("Delay"));
-	tmpm->SetFont(be_plain_font);
-
-	msg = new BMessage(MSG_SET_DELAY);
-	msg->AddInt64(AR_DELAY, 100000LL);
-	tmpi = new BMenuItem(B_TRANSLATE("0.1 s"), msg);
-	tmpi->SetMarked(tv->raise_delay == 100000LL);
-	tmpm->AddItem(tmpi);
-
-	msg = new BMessage(MSG_SET_DELAY);
-	msg->AddInt64(AR_DELAY, 200000LL);
-	tmpi = new BMenuItem(B_TRANSLATE("0.2 s"), msg);
-	tmpi->SetMarked(tv->raise_delay == 200000LL);
-	tmpm->AddItem(tmpi);
-
-	msg = new BMessage(MSG_SET_DELAY);
-	msg->AddInt64(AR_DELAY, 500000LL);
-	tmpi = new BMenuItem(B_TRANSLATE("0.5 s"), msg);
-	tmpi->SetMarked(tv->raise_delay == 500000LL);
-	tmpm->AddItem(tmpi);
-
-	msg = new BMessage(MSG_SET_DELAY);
-	msg->AddInt64(AR_DELAY, 1000000LL);
-	tmpi = new BMenuItem(B_TRANSLATE("1 s"), msg);
-	tmpi->SetMarked(tv->raise_delay == 1000000LL);
-	tmpm->AddItem(tmpi);
-
-	msg = new BMessage(MSG_SET_DELAY);
-	msg->AddInt64(AR_DELAY, 2000000LL);
-	tmpi = new BMenuItem(B_TRANSLATE("2 s"), msg);
-	tmpi->SetMarked(tv->raise_delay == 2000000LL);
-	tmpm->AddItem(tmpi);
-
-	msg = new BMessage(MSG_SET_DELAY);
-	msg->AddInt64(AR_DELAY, 3000000LL);
-	tmpi = new BMenuItem(B_TRANSLATE("3 s"), msg);
-	tmpi->SetMarked(tv->raise_delay == 3000000LL);
-	tmpm->AddItem(tmpi);
-
-	msg = new BMessage(MSG_SET_DELAY);
-	msg->AddInt64(AR_DELAY, 4000000LL);
-	tmpi = new BMenuItem(B_TRANSLATE("4 s"), msg);
-	tmpi->SetMarked(tv->raise_delay == 4000000LL);
-	tmpm->AddItem(tmpi);
-
-	msg = new BMessage(MSG_SET_DELAY);
-	msg->AddInt64(AR_DELAY, 5000000LL);
-	tmpi = new BMenuItem(B_TRANSLATE("5 s"), msg);
-	tmpi->SetMarked(tv->raise_delay == 5000000LL);
-	tmpm->AddItem(tmpi);
-
-	tmpm->SetTargetForItems(tv);
-	BMenuItem *delaym = new BMenuItem(tmpm);
-	delaym->SetEnabled(s->Active());
-
-	AddItem(delaym);
+	msg = new BMessage('ENAA');
+	tmpi = new BMenuItem(B_TRANSLATE("Enable all"), msg);
+	AddItem(tmpi);
 
 	AddSeparatorItem();
-//	AddItem(new BMenuItem("Settings...", new BMessage(OPEN_SETTINGS)));
 
 	AddItem(new BMenuItem(B_TRANSLATE("About " APP_NAME B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED)));
@@ -252,8 +149,6 @@ void TrayView::_init()
 	get_thread_info(find_thread(NULL), &ti);
 	fDeskbarTeam = ti.team;
 
-	resume_thread(poller_thread = spawn_thread(poller, "AutoRaise desktop "
-		"poller", B_NORMAL_PRIORITY, (void *)this));
 
 	image_info info;
 	{
@@ -397,7 +292,12 @@ void TrayView::MouseDown(BPoint where) {
 		switch(buttons) {
 			case B_PRIMARY_MOUSE_BUTTON:
 			{
-				SetActive(!_settings->Active());
+				ConvertToScreen(&where);
+
+				//menu will delete itself (see constructor of ConfigMenu),
+				//so all we're concerned about is calling Go() asynchronously
+				ConfigMenu *menu = new ConfigMenu(this, false);
+				menu->Go(where, true, true, ConvertToScreen(Bounds()), true);
 
 				break;
 			}
@@ -416,114 +316,6 @@ void TrayView::MouseDown(BPoint where) {
 	}
 }
 
-
-int32 fronter(void *arg)
-{
-	TrayView *tv = (TrayView *)arg;
-	int32 ws = current_workspace();
-	volatile int32 tok = tv->current_window;
-	sem_id sem = tv->fPollerSem;
-
-	snooze(tv->raise_delay);
-
-	if (acquire_sem(sem) != B_OK)
-		return B_OK; // this really needs a better locking model...
-	if (ws != current_workspace())
-		goto end; // don't touch windows if we changed workspace
-	if (tv->last_raiser_thread != find_thread(NULL))
-		goto end; // seems a newer one has been spawn, exit
-PRINT(("tok = %" B_PRId32 " cw = %" B_PRId32 "\n", tok, tv->current_window));
-	if (tok == tv->current_window) {
-		bool doZoom = false;
-		BRect zoomRect(0.0f, 0.0f, 10.0f, 10.0f);
-		do_window_action(tok, B_BRING_TO_FRONT, zoomRect, doZoom);
-	}
-
-	end:
-	release_sem(sem);
-	return B_OK;
-}
-
-
-int32 poller(void *arg)
-{
-	TrayView *tv = (TrayView *)arg;
-	volatile int32 tok = tv->current_window;
-	int32 *tl = NULL;
-	int32 i, tlc;
-	window_info *wi = NULL;
-
-	int pass=0;
-	BPoint mouse;
-	uint32 buttons;
-
-	while (acquire_sem(tv->fPollerSem) == B_OK) {
-		release_sem(tv->fPollerSem);
-		pass++;
-		BLooper *l = tv->Looper();
-		if (!l || l->LockWithTimeout(500000) != B_OK)
-			continue;
-		tv->GetMouse(&mouse, &buttons);
-		tv->ConvertToScreen(&mouse);
-		tv->Looper()->Unlock();
-		if (buttons) // we don't want to interfere when the user is moving a window or something...
-			goto zzz;
-
-		tl = get_token_list(-1, &tlc);
-		for (i=0; i<tlc; i++) {
-			free(wi);
-			wi = get_window_info(tl[i]);
-			if (wi) {
-PRINT(("wi [%" B_PRId32 "] = %p, %" B_PRId32 " %s\n", i, wi, wi->layer,
-	((struct client_window_info *)wi)->name));
-				if (wi->layer < 3) // we hit the desktop or a window not on this WS
-					continue;
-				if ((wi->window_left > wi->window_right) || (wi->window_top > wi->window_bottom))
-					continue; // invalid window ?
-				if (wi->is_mini)
-					continue;
-
-PRINT(("if (!%s && (%li, %li)isin(%" B_PRId32 ")(%" B_PRId32 ", %" B_PRId32
-	", %" B_PRId32 ", %" B_PRId32 ") && (%" B_PRId32 " != %" B_PRId32 ") \n",
-	wi->is_mini?"true":"false", (long)mouse.x, (long)mouse.y, i,
-	wi->window_left, wi->window_right, wi->window_top, wi->window_bottom,
-	wi->server_token, tok));
-
-
-
-				if ((((long)mouse.x) > wi->window_left) && (((long)mouse.x) < wi->window_right)
-					&& (((long)mouse.y) > wi->window_top) && (((long)mouse.y) < wi->window_bottom)) {
-//((tv->_settings->Mode() != Mode_DeskbarOver) || (wi->team == tv->fDeskbarTeam))
-
-					if ((tv->_settings->Mode() == Mode_All) && 
-					(wi->server_token == tv->current_window))
-						goto zzz; // already raised
-
-					if ((tv->_settings->Mode() == Mode_All) || (wi->team == tv->fDeskbarTeam)) {
-						tv->current_window = wi->server_token;
-						tok = wi->server_token;
-						resume_thread(tv->last_raiser_thread = spawn_thread(fronter, "fronter", B_NORMAL_PRIORITY, (void *)tv));
-						goto zzz;
-					} else if (tv->_settings->Mode() == Mode_DeskbarTouch) // give up, before we find Deskbar under it
-						goto zzz;
-				}
-				free(wi);
-				wi=NULL;
-			} else
-				goto zzz;
-		}
-	zzz:
-//		puts("");
-		if (wi) free(wi);
-		wi = NULL;
-		if (tl) free(tl);
-		tl = NULL;
-		snooze(tv->polling_delay);
-	}
-	return B_OK;
-}
-
-
 void TrayView::MessageReceived(BMessage* message)
 {
 	BMessenger msgr;
@@ -534,38 +326,14 @@ void TrayView::MessageReceived(BMessage* message)
 
 	switch(message->what)
 	{
-		case MSG_TOGGLE_ACTIVE:
-			SetActive(!_settings->Active());
+		case 'TOGL':
+			int deviceId = 0;
+			if (B_OK != message->FindInt16("device", &deviceId)) break;
+			Toggle(deviceId);
 			break;
-		case MSG_SET_ACTIVE:
-			SetActive(true);
+		case 'ENAA':
+			EnableAll();
 			break;
-		case MSG_SET_INACTIVE:
-			SetActive(false);
-			break;
-		case MSG_SET_DELAY:
-			delay = DEFAULT_DELAY;
-			message->FindInt64(AR_DELAY, &delay);
-			raise_delay = delay;
-			_settings->SetDelay(delay);
-			break;
-		case MSG_SET_MODE:
-			mode = Mode_All;
-			message->FindInt32(AR_MODE, &mode);
-			_settings->SetMode(mode);
-			break;
-		case MSG_SET_BEHAVIOUR:
-		{
-			message->FindInt32(AR_BEHAVIOUR, &mode);
-			bool wasactive = _settings->Active();
-			if (wasactive)
-				SetActive(false);
-			fNormalMM = (mode_mouse)mode;
-			set_mouse_mode(fNormalMM);
-			if (wasactive)
-				SetActive(true);
-			break;
-		}
 		case REMOVE_FROM_TRAY:
 		{
 			thread_id tid = spawn_thread(removeFromDeskbar, "RemoveFromDeskbar", B_NORMAL_PRIORITY, (void*)this);
@@ -597,34 +365,47 @@ AutoRaiseSettings *TrayView::Settings() const
 	return _settings;
 }
 
-void TrayView::SetActive(bool st)
+void TrayView::Toggle(int deviceNo)
 {
-	_settings->SetActive(st);
-	if (_settings->Active())
-	{
-		if (!watching) {
-			fNormalMM = mouse_mode();
-			set_mouse_mode(B_FOCUS_FOLLOWS_MOUSE);
-			release_sem(fPollerSem);
-			watching = true;
+	BList devList;
+	BuildDevicesList(devList);
+	int totalItems = devList.CountItems();
+	for (int i = 0; i < totalItems; i++) {
+		if (i == deviceNo) {
+			DeviceStructure* devStruct = static_cast<DeviceStructure>(devList.ItemAt(i));
+			if (devStruct) {
+				if (devStruct->enabled && totalItems > 1) {
+					device->Stop();
+				}
+				if (!devStruct->enabled) {
+					device->Start();
+				}
+			}
 		}
 	}
-	else
-	{
-		if (watching) {
-			acquire_sem(fPollerSem);
-			set_mouse_mode(fNormalMM);
-			watching = false;
+	Clean(&toReturn, true);
+}
+
+
+void TrayView::EnableAll() {
+	BList devList;
+	BuildDevicesList(devList);
+	int totalItems = devList.CountItems();
+	for (int i = 0; i < totalItems; i++) {
+		DeviceStructure* devStruct = static_cast<DeviceStructure>(devList.ItemAt(i));
+		if (devStruct) {
+			if (!devStruct->enabled) {
+				device->Start();
+			}
 		}
 	}
-	Invalidate();
+	Clean(&toReturn, true);
 }
 
 
 
-
-void TrayView::BuildDevicesList() {
-	this->Clean(&fInputDevices, true);
+void BuildDevicesList(BList& toReturn) {
+	Clean(&toReturn, true);
 	BList devices;
     status_t err = get_input_devices(&devices);
     if (err != B_OK) {
@@ -644,16 +425,17 @@ void TrayView::BuildDevicesList() {
     for (uint i = 0; i < count; i++) {
     	DeviceStructure* device = new DeviceStructure();
     	device->device = static_cast<BInputDevice*>(devices.ItemAt(i));
+    	device->name.SetTo(device->device->Name());
     	device->enabled = device->device->IsRunning();
     	device->number = i;
-    	gDevices.AddItem(device, i);
+    	toReturn.AddItem(device, i);
     }
     
     this->Clean(&devices, false);
 }
 
 
-void TrayView::Clean(BList *in, bool cleaningGlobalDevices = false) {
+void Clean(BList *in, bool cleaningGlobalDevices = false) {
 	if (!in) return;
 	uint count = in->CountItems();
 	for (int32 i = count-1; i >=0; i--) {
@@ -669,8 +451,9 @@ void TrayView::Clean(BList *in, bool cleaningGlobalDevices = false) {
 }
 
 
-void TrayView::ListDevices() {
-	this->BuildListOfDevices();
+void ListDevices() {
+	BList devices;
+	BuildListOfDevices();
 	
     int32 count = 0;
     count = fInputDevices.CountItems();
