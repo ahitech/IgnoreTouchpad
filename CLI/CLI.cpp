@@ -269,7 +269,7 @@ status_t ExecuteCommand(const ParsedCommand& command) {
 				}
 				for (uint i = 0; i < count; i++) {
 					DeviceStructure* dev = (DeviceStructure*)gDevices.ItemAt(i);
-					if (dev->number == i) {
+					if (dev->number == command.deviceNumber) {
 						return DisableDevice(dev->device);
 					}	
 				}
